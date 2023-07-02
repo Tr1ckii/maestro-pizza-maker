@@ -5,7 +5,7 @@ from typing import List, Literal, Optional
 
 from maestro_pizza_maker.ingredients import PizzaIngredients
 import numpy as np
-
+import random
 
 @dataclass
 class Pizza:
@@ -72,14 +72,14 @@ class Pizza:
 
     @property
     def fat(self) -> np.array:
-        return sum(ingredient.value.fat for ingredient in self.ingredients)
+        return np.sum(ingredient.value.fat for ingredient in self.ingredients)
 
     @property
     def average_fat(self) -> float:
         # TODO: implement average fat calculation
         # HINT: check the `PizzaIngredients` class properly, you will find a `fat` property there which is a numpy array representing the drawings from the fat distribution
         # since fat is a random variable, we will calculate the average fat of the pizza by averaging the fat vectors of the ingredients
-        pass
+        return np.average([ingredient.value.fat for ingredient in self.ingredients])
 
     @property
     def carbohydrates(self) -> float:
@@ -94,7 +94,13 @@ class Pizza:
         # TODO: implement name generation, it is purely up to you how you want to do it
         # (you can use random, you can use some kind of algorithm) - just make sure that
         # the name is unique.
-        pass
+        names = [PizzaIngredients.name for PizzaIngredients in self.ingredients]
+
+        pizza_name = "Pizza"
+        for name in names:
+            pizza_name +=  " " + name
+
+        return pizza_name
 
     @property
     def taste(self) -> np.array:
@@ -102,6 +108,23 @@ class Pizza:
         # The famous fact that taste is subjective is not true in this case. We believe that fat is the most important factor, since fat carries the most flavor.
         # So we will use the fat vector to calculate the taste of the pizza with the following formula:
         # taste = 0.05 * fat_dough + 0.2 * fat_sauce + 0.3 * fat_cheese + 0.1 * fat_fruits + 0.3 * fat_meat + 0.05 * fat_vegetables
-        pass
+        fat_dough = self.dough.value.fat
+        fat_sauce = self.sauce.value.fat
+        fat_cheese = np.sum([cheese.value.fat for cheese in self.cheese])
+        fat_fruits = np.sum([fruit.value.fat for fruit in self.fruits])
+        fat_meat = np.sum([meat.value.fat for meat in self.meat])
+        fat_vegetables = np.sum([vegetable.value.fat for vegetable in self.vegetables])
+
+        taste = np.array([
+                0.05 * fat_dough
+                + 0.2 * fat_sauce
+                + 0.3 * fat_cheese
+                + 0.1 * fat_fruits
+                + 0.3 * fat_meat
+                + 0.05 * fat_vegetables
+                ]
+        )
+
+        return taste
 
 
